@@ -2,16 +2,12 @@
 The command line interface to the Server application
 """
 
+import asyncio
 import click
 import logging
 from nea.server.main import main
+from nea.services.server import Server
 
-
-LISTEN_ADDR = 'localhost'
-LISTEN_PORT = 3443
-SERVER_CERT = 'certs/my.crt'
-SERVER_KEY = 'certs/my.key'
-DATE_PERIOD = 5
 
 logging.basicConfig()
 log = logging.getLogger()
@@ -19,24 +15,27 @@ log.setLevel(logging.INFO)
 
 @click.command()
 @click.option(
-    "--port", "-p", default=LISTEN_PORT, help="TCP Port on which to serve"
+    "--port", "-p", default=Server.HOST_PORT, help="TCP Port on which to serve"
 )
 @click.option(
-    "--cert", "-c", default=SERVER_CERT, type=click.Path(exists=True), help="TLS Certificate file"
+    "--cert", "-c", default=Server.SERVER_CERT, type=click.Path(exists=True), help="TLS Certificate file"
 )
 @click.option(
-    "--key", "-c", default=SERVER_KEY, type=click.Path(exists=True), help="TLS Key file"
+    "--key", "-c", default=Server.SERVER_KEY, type=click.Path(exists=True), help="TLS Key file"
 )
 @click.option(
-    "--date-period", "-d", default=DATE_PERIOD, help="Time (sec.) between each date broadcast"
+    "--max-clients", "-m", default=Server.MAX_CLIENTS, help="Max nummber of clients served concurrently"
+)
+@click.option(
+    "--date-period", "-d", default=Server.DATE_PERIOD, help="Time (sec.) between each date broadcast"
 )
 @click.option(
     "--verbose", "-v", is_flag=True, default=True, help="Log at debug level"
 )
-def cli(port, cert, key, date_period, verbose):
+def cli(port, cert, key, max_clients, date_period, verbose):
     if verbose:
         log.setLevel(logging.DEBUG)
-    main(port, cert, key, date_period)
+    asyncio.run(main(port, cert, key, max_clients, date_period))
 
 
 if __name__ == '__main__':

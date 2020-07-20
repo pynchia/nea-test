@@ -2,13 +2,12 @@
 The functionality to process the incoming metrics
 """
 
-from datetime import datetime
-import json
+# import json
 import logging
 
-import psycopg2 as pg
 
-from aiven.broker.services.message import Message
+# from nea.services.message import Message
+from nea.services.message import MSG_SEPARATOR
 
 
 log = logging.getLogger()
@@ -31,12 +30,12 @@ class Processor:
         """
         Process the incoming msg
         """
-        rev_msg = msg[::-1]
-        log.info(f"Reversed msg {msg} to {rev_msg}")
-        return rev_msg
-
         # try:
         #     message = Message.parse(msg)
         # except MessageDecodeError as e:
         #     log.error(e)
         # else:
+        rev_msg = msg[::-1]
+        log.info(f"Reversed msg {msg} to {rev_msg}")
+        return rev_msg
+
