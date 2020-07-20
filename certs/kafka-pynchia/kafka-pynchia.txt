@@ -1,0 +1,10 @@
+Service URI:
+kafka-pynchia-pynchia-5785.aivencloud.com:12272
+
+Host:
+kafka-pynchia-pynchia-5785.aivencloud.com
+Port:
+12272
+
+
+
