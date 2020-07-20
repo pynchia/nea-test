@@ -30,12 +30,13 @@ class Processor:
         """
         Process the incoming msg
         """
+        # it would be nice to wrap the msgs into a Message
         # try:
         #     message = Message.parse(msg)
         # except MessageDecodeError as e:
         #     log.error(e)
         # else:
         rev_msg = msg[::-1]
-        log.info(f"Reversed msg {msg} to {rev_msg}")
+        # log.info(f"reversed msg {msg} to {rev_msg}")
         return rev_msg
 

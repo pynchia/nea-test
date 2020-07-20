@@ -13,7 +13,7 @@ class Server:
     HOST_PORT = 3443
     SERVER_CERT = 'certs/my.crt'
     SERVER_KEY = 'certs/my.key'
-    MAX_CLIENTS = 2
+    MAX_CLIENTS = 1
     DATE_PERIOD = 5
 
     def __init__(self, port, cert, key, max_clients, date_period, processor):
@@ -36,20 +36,31 @@ class Server:
         self.broadcaster.cancel()
         self.server.close()
         await self.server.wait_closed()
+        log.info("Server has shutdown")
 
     async def _handle_client(self, reader, writer):
+        w_info = writer.get_extra_info('peername')
+        if len(self.writers) >= self.max_clients:
+            log.warning(f"Refusing {w_info} to join, too many clients (max {self.max_clients}), disconnected")
+            writer.close()
+            try:
+                await writer.wait_closed()
+            except ssl.SSLError:
+                pass
+            return
+
         # add the writer to the pool of open client connections
-        self.writers[writer] = w_info = writer.get_extra_info('peername')
-        log.info(f"Client {w_info} joins")
+        self.writers[writer] = w_info
+        log.info(f"client {w_info} joins")
         while True:
             request = (await reader.readline()).decode().rstrip()
             if request:
-                log.info(f"Received {request} from {w_info}")
+                log.info(f"{request=} from {w_info}")
                 response = self.processor(request)  # process the request
                 writer.write((response+MSG_SEPARATOR).encode())
-                log.info(f"Responded with {response} to {w_info}")
+                log.info(f"{response=} sent to {w_info}")
             else:  # I would have expected to be able to catch an exception
-                log.info(f"Client {w_info} quits")
+                log.info(f"client {w_info} quits")
                 break
 
         del self.writers[writer]  # remove the writer from the pool
@@ -65,7 +76,7 @@ class Server:
                 self.HOST_ADDR, self.port,
                 ssl=self.ssl_context
         )
-        log.info("Server is up")
+        log.info("server is up")
 
     async def _broadcast_date(self):
         while True:
@@ -78,10 +89,11 @@ class Server:
             cur_date = str(date.today())
             for writer, w_info in self.writers.items():
                 writer.write((cur_date+MSG_SEPARATOR).encode())
-                log.info(f"Written {cur_date} to {w_info}")
+                log.info(f"{cur_date=} sent to {w_info}")
 
     async def _start_broadcaster(self) -> None:
         """
         Start broadcasting date to all clients
         """
         self.broadcaster = asyncio.create_task(self._broadcast_date())
+        log.info("date-broadcaster is up")
