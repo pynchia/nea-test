@@ -1,6 +1,5 @@
 
-from nea.services.message import Message
-from nea.services.message import Message
+# from nea.services.message import Message
 
 
 async def generate_data():

@@ -5,21 +5,15 @@ import pytest
 import ssl
 
 from nea.server.process import Processor
-from nea.services.server import Server
+import nea.services.server as server
 from nea.services.message import MSG_SEPARATOR
 
 
 @pytest.mark.asyncio
 async def test_server_end_to_end_without_date_received_yet(ssl_context):
-    async with Server(
-        Server.HOST_PORT,
-        Server.SERVER_CERT, Server.SERVER_KEY,
-        Server.MAX_CLIENTS, Server.DATE_PERIOD,
-        Processor()
-        ) as server:
-
+    async with server.Server(Processor()):
         reader, writer = await asyncio.open_connection(
-            Server.HOST_ADDR, Server.HOST_PORT, ssl=ssl_context
+            server.HOST_ADDR, server.HOST_PORT, ssl=ssl_context
         )
         request = 'test'
         writer.write((request+MSG_SEPARATOR).encode())
@@ -31,15 +25,9 @@ async def test_server_end_to_end_without_date_received_yet(ssl_context):
 
 @pytest.mark.asyncio
 async def test_server_end_to_end_receive_date_only(ssl_context):
-    async with Server(
-        Server.HOST_PORT,
-        Server.SERVER_CERT, Server.SERVER_KEY,
-        Server.MAX_CLIENTS, Server.DATE_PERIOD,
-        Processor()
-        ) as server:
-
+    async with server.Server(Processor()):
         reader, writer = await asyncio.open_connection(
-            Server.HOST_ADDR, Server.HOST_PORT, ssl=ssl_context
+            server.HOST_ADDR, server.HOST_PORT, ssl=ssl_context
         )
 
         await asyncio.sleep(server.DATE_PERIOD+1)
@@ -54,15 +42,9 @@ async def test_server_end_to_end_receive_date_only(ssl_context):
 
 @pytest.mark.asyncio
 async def test_server_end_to_end_with_all(ssl_context):
-    async with Server(
-        Server.HOST_PORT,
-        Server.SERVER_CERT, Server.SERVER_KEY,
-        Server.MAX_CLIENTS, Server.DATE_PERIOD,
-        Processor()
-        ) as server:
-
+    async with server.Server(Processor()):
         reader, writer = await asyncio.open_connection(
-            Server.HOST_ADDR, Server.HOST_PORT, ssl=ssl_context
+            server.HOST_ADDR, server.HOST_PORT, ssl=ssl_context
         )
         request = 'test'
         writer.write((request+MSG_SEPARATOR).encode())
@@ -81,23 +63,17 @@ async def test_server_end_to_end_with_all(ssl_context):
 
 @pytest.mark.asyncio
 async def test_server_too_many_clients(ssl_context):
-    async with Server(
-        Server.HOST_PORT,
-        Server.SERVER_CERT, Server.SERVER_KEY,
-        Server.MAX_CLIENTS, Server.DATE_PERIOD,
-        Processor()
-        ) as server:
-
+    async with server.Server(Processor()):
         # saturate the server connecting the max supported clients
         cnx = [
             await asyncio.open_connection(
-                Server.HOST_ADDR, Server.HOST_PORT, ssl=ssl_context
-            ) for _ in range(Server.MAX_CLIENTS)
+                server.HOST_ADDR, server.HOST_PORT, ssl=ssl_context
+            ) for _ in range(server.MAX_CLIENTS)
         ]
 
         # One more client should fail
         reader, writer = await asyncio.open_connection(
-            Server.HOST_ADDR, Server.HOST_PORT, ssl=ssl_context
+            server.HOST_ADDR, server.HOST_PORT, ssl=ssl_context
         )
         request = 'test'
         writer.write((request+MSG_SEPARATOR).encode())

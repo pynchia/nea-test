@@ -18,10 +18,9 @@ class ServerDisconnect(Exception):
 
 
 class Client:
-    def __init__(self, processor,
+    def __init__(self,
                  host=HOST_ADDR, port=HOST_PORT,
                  cert=CLIENT_CERT, key=CLIENT_KEY):
-        self.processor = processor
         self.host = host
         self.port = port
         self.ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
@@ -36,7 +35,7 @@ class Client:
     async def __aexit__(self, exc_type, exc_value, traceback) -> bool:
         self.writer.close()
 
-    async def request_and_process(self, msg: str):
+    async def request(self, msg: str):
         self.writer.write((msg+MSG_SEPARATOR).encode())
         await self.writer.drain()
         log.info(f"sent {msg=}")
@@ -44,4 +43,4 @@ class Client:
         if not response:
             raise ServerDisconnect
         log.info(f"received {response=}")
-        self.processor(response)  # process the response
+        return response

@@ -5,7 +5,7 @@ import asyncio
 import click
 import logging
 
-import nea.services.client
+import nea.services.client as client
 from nea.client.main import main
 
 
