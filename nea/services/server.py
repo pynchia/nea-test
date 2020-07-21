@@ -12,8 +12,8 @@ HOST_ADDR = 'localhost'
 HOST_PORT = 3443
 SERVER_CERT = 'certs/my.crt'
 SERVER_KEY = 'certs/my.key'
-MAX_CLIENTS = 1
-DATE_PERIOD = 5
+MAX_CLIENTS = 100  # max number of contemporary clients served
+DATE_PERIOD = 10  # seconds between date broadcasts to the clients
 
 class Server:
     def __init__(self,

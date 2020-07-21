@@ -1,4 +1,4 @@
-# Client/Server Test
+# TCP Client/Server Test
 
 Build a tcp client and a tcp server with python > 3.5.x.
 
@@ -16,33 +16,56 @@ The client should listen to the standard input and send a text message to the se
 
 All the implementation must be covered  with automated tests.
 
-## Setup and execution of the tests
+## Setup
 
-`docker build --no-cache --target pybuild -t testbuild .`
+Clone the repository:
 
-`docker run -it testbuild`
+`git clone git@github.com:pynchia/nea-test.git`
 
-## Setup and execution of the server
+Descend into the newly created directory:
 
-Go to the root `nea-test` directory and build the docker image
+`cd nea-test/`
 
-`docker build -t appbuild .`
+Create the virtual environment:
 
-Launch it
+`python3 -m venv .venv`
 
-`docker run -it -p 3443:3443 appbuild servercli`
+Activate the virtual environment:
 
-## Setup and execution of the clients
+`. .venv/bin/activate`
 
-For each client, open a new terminal and launch the client
+Upgrade pip:
 
-`docker run -it 
--p 3443:3443
-appbuild clientcli`
+`pip install -U pip`
+
+Install the requirements:
+
+the external packages first
+`pip install -r requirements.txt`
+
+and then the internal modules
+`pip install .`
+
+
+## Execute the tests
+
+`. ./run-tests.sh`
+
+## Launch the server
+
+`servercli`
+
+## Launch the client(s)
+
+For each client:
+- open a new terminal
+- descend into the same project directory (`nea-test/`)
+- activate the virtual environment (`. .venv/bin/activate`)
+- launch the client with `clientcli`
 
 ## Notes and Improvements
 
-The server response (the reversed string) and the date are sent on the same level to the client (i.e. in-band signalling in telecoms parliance).
+The server response (the reversed string) and the date are sent on the same channel to the client (i.e. in-band signalling in telecoms parliance).
 In order to be able to tell them apart and interpret the contents in a cleaner way, we could send such payloads as part of a structured message, e.g. serialised in JSON format:
 
 {
@@ -50,4 +73,4 @@ In order to be able to tell them apart and interpret the contents in a cleaner w
     "payload": either the reversed string or the date
 }
 
-To such aim, the `nea.services.message` module contains a class to encode/decode such message structure.
+To such aim, the `nea.services.message` module contains a class to encode/decode such message structure and the code already contains a few references to it (now commentated out)
