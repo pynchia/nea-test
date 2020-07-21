@@ -15,7 +15,7 @@ log = logging.getLogger()
 
 async def main(host: str, port: int, cert: str, key: str):
     processor = lambda resp: log.info(f"processing {resp}")
-    async with Client(host, port, cert, key, processor) as client:
+    async with Client(processor, host, port, cert, key) as client:
         async for msg in generate_data():
             try:
                 await client.request_and_process(msg)

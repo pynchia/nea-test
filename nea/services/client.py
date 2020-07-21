@@ -8,21 +8,22 @@ from nea.services.message import MSG_SEPARATOR
 
 log = logging.getLogger()
 
+HOST_ADDR = 'localhost'
+HOST_PORT = 3443
+CLIENT_CERT = 'certs/my.crt'
+CLIENT_KEY = 'certs/my.key'
 
 class ServerDisconnect(Exception):
     pass
 
 
 class Client:
-    HOST_ADDR = 'localhost'
-    HOST_PORT = 3443
-    CLIENT_CERT = 'certs/my.crt'
-    CLIENT_KEY = 'certs/my.key'
-
-    def __init__(self, host, port, cert, key, processor):
+    def __init__(self, processor,
+                 host=HOST_ADDR, port=HOST_PORT,
+                 cert=CLIENT_CERT, key=CLIENT_KEY):
+        self.processor = processor
         self.host = host
         self.port = port
-        self.processor = processor
         self.ssl_context = ssl.create_default_context(ssl.Purpose.SERVER_AUTH)
         self.ssl_context.check_hostname = False
         self.ssl_context.load_verify_locations('certs/my.crt')

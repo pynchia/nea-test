@@ -8,15 +8,20 @@ from nea.services.message import MSG_SEPARATOR
 
 log = logging.getLogger()
 
-class Server:
-    HOST_ADDR = 'localhost'
-    HOST_PORT = 3443
-    SERVER_CERT = 'certs/my.crt'
-    SERVER_KEY = 'certs/my.key'
-    MAX_CLIENTS = 1
-    DATE_PERIOD = 5
+HOST_ADDR = 'localhost'
+HOST_PORT = 3443
+SERVER_CERT = 'certs/my.crt'
+SERVER_KEY = 'certs/my.key'
+MAX_CLIENTS = 1
+DATE_PERIOD = 5
 
-    def __init__(self, port, cert, key, max_clients, date_period, processor):
+class Server:
+    def __init__(self,
+                 processor,
+                 port=HOST_PORT,
+                 cert=SERVER_CERT, key=SERVER_KEY,
+                 max_clients=MAX_CLIENTS,
+                 date_period=DATE_PERIOD):
         self.port = port
         self.max_clients = max_clients
         self.date_period = date_period
@@ -73,7 +78,7 @@ class Server:
         """
         self.server = await asyncio.start_server(
                 self._handle_client,
-                self.HOST_ADDR, self.port,
+                HOST_ADDR, self.port,
                 ssl=self.ssl_context
         )
         log.info("server is up")

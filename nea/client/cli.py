@@ -5,7 +5,7 @@ import asyncio
 import click
 import logging
 
-from nea.services.client import Client
+import nea.services.client
 from nea.client.main import main
 
 
@@ -16,16 +16,16 @@ log.setLevel(logging.INFO)
 
 @click.command()
 @click.option(
-    "--host", "-h", default=Client.HOST_ADDR, help="The server's address"
+    "--host", "-h", default=client.HOST_ADDR, help="The server's address"
 )
 @click.option(
-    "--port", "-p", default=Client.HOST_PORT, help="The server's TCP port"
+    "--port", "-p", default=client.HOST_PORT, help="The server's TCP port"
 )
 @click.option(
-    "--cert", "-c", default=Client.CLIENT_CERT, type=click.Path(exists=True), help="TLS Certificate file"
+    "--cert", "-c", default=client.CLIENT_CERT, type=click.Path(exists=True), help="TLS Certificate file"
 )
 @click.option(
-    "--key", "-c", default=Client.CLIENT_KEY, type=click.Path(exists=True), help="TLS Key file"
+    "--key", "-c", default=client.CLIENT_KEY, type=click.Path(exists=True), help="TLS Key file"
 )
 @click.option(
     "--verbose", "-v", is_flag=True, default=False, help="Log at debug level"
