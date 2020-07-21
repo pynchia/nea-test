@@ -46,7 +46,6 @@ the external packages first
 and then the internal modules
 `pip install .`
 
-
 ## Execute the tests
 
 `. ./run-tests.sh`
@@ -58,12 +57,15 @@ and then the internal modules
 ## Launch the client(s)
 
 For each client:
+
 - open a new terminal
 - descend into the same project directory (`nea-test/`)
 - activate the virtual environment (`. .venv/bin/activate`)
 - launch the client with `clientcli`
 
 ## Notes and Improvements
+
+### In-band messaging
 
 The server response (the reversed string) and the date are sent on the same channel to the client (i.e. in-band signalling in telecoms parliance).
 In order to be able to tell them apart and interpret the contents in a cleaner way, we could send such payloads as part of a structured message, e.g. serialised in JSON format:
@@ -74,3 +76,13 @@ In order to be able to tell them apart and interpret the contents in a cleaner w
 }
 
 To such aim, the `nea.services.message` module contains a class to encode/decode such message structure and the code already contains a few references to it (now commentated out)
+
+### Date-broadcaster optimisation
+
+The server date broadcaster is active even if there are no clients connected.
+
+It sleeps for ten seconds then it sends the date to all the clients.
+
+The cpu time spent checking the list of clients is negligible, but from a purist point of view it could be avoided.
+
+Simply put, the broadcaster task could be cancelled when the only remaining client disconnects and be created when the first client connects.
