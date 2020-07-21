@@ -78,3 +78,37 @@ async def test_server_end_to_end_with_all(ssl_context):
 
         writer.close()
         await writer.wait_closed()
+
+@pytest.mark.asyncio
+async def test_server_too_many_clients(ssl_context):
+    async with Server(
+        Server.HOST_PORT,
+        Server.SERVER_CERT, Server.SERVER_KEY,
+        Server.MAX_CLIENTS, Server.DATE_PERIOD,
+        Processor()
+        ) as server:
+
+        # saturate the server connecting the max supported clients
+        cnx = [
+            await asyncio.open_connection(
+                Server.HOST_ADDR, Server.HOST_PORT, ssl=ssl_context
+            ) for _ in range(Server.MAX_CLIENTS)
+        ]
+
+        # One more client should fail
+        reader, writer = await asyncio.open_connection(
+            Server.HOST_ADDR, Server.HOST_PORT, ssl=ssl_context
+        )
+        request = 'test'
+        writer.write((request+MSG_SEPARATOR).encode())
+        # await writer.drain()
+        response = (await reader.readline()).decode().rstrip()
+        assert not response # expect no response
+
+        writer.close()
+        await writer.wait_closed()
+
+        # disconnect all initial max clients
+        for reader, writer in cnx:
+            writer.close()
+            await writer.wait_closed()
